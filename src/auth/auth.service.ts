@@ -17,7 +17,8 @@ export class AuthService {
 
   async signUp(dto: AuthDto): Promise<Msg>{
     console.log(dto.password);
-    const hashed = await bcrypt.hash(dto.password,12);
+    const hashed = await bcrypt.hash(dto.password.replace(/\r?\n/g, ''),12);
+    // const hashed = dto.password;
     try{
       await this.prisma.user.create({
         data:{
@@ -45,6 +46,7 @@ export class AuthService {
     });
     if (!user) throw new ForbiddenException('Email or password incorrect');
     const isValid = await bcrypt.compare(dto.password,user.hashedPassword);
+    // const isValid = dto.password == user.hashedPassword;
     console.log(isValid);
     if (!isValid) {
       // エラーメッセージと関連するデータをログに出力
